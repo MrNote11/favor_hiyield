@@ -10,6 +10,7 @@ import re
 import secrets
 from django.core.mail import send_mail
 from django.conf import settings
+from models import Roles, Features
 
 class SignUpAdminSerializers(serializers.ModelSerializer):
     
@@ -55,4 +56,7 @@ class SignUpAdminSerializers(serializers.ModelSerializer):
             raise serializers.ValidationError("Username already exists.")
         return value
     
-class 
+class AssignRolesAndFeatures(serializers.ModelSerializer):
+    class Meta:
+        model = Features
+        fields = ['roles', 'user', 'features']

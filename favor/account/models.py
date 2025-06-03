@@ -12,5 +12,5 @@ class Roles(models.Model):
 class Features(models.Model):
     roles = models.ForeignKey(Roles, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    features = models.CharField(max_length=20)
+    features = models.CharField(max_length=20, null=True, blank=True)
 
