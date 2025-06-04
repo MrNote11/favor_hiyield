@@ -5,8 +5,8 @@ import os
 from dotenv import load_dotenv
 import random
 from django.contrib.auth import get_user_model
-from django.core.mail import get_connection,EmailMessage
-
+from django.core.mail import send_mail
+from django.utils import timezone
 load_dotenv()
 
 
@@ -46,37 +46,28 @@ class AdminForgotPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
     def validate_email(self, email):
-        Admin_user = User.objects.filter(email=email).first()
-        if not Admin_user:
+        user = User.objects.filter(email=email).first()
+        if not user:
             raise serializers.ValidationError("User with this email does not exist.")
-        self.Admin_user = Admin_user
+        self.user = user
         return email
 
     def create(self, validated_data):
-        otp_code = str(random.randint(100000, 999999))
-        otp_obj, created = OTP.objects.get_or_create(user=self.user)
-        otp_obj.otp = otp_code
-        otp_obj.save()
+        otp_obj, _ = OTP.objects.get_or_create(user=self.user)
+        otp_code = otp_obj.generate_otp() 
 
-        # Send OTP via email
-        connection = get_connection(
-            host='smtp.gmail.com',
-            port=587,
-            username=os.getenv('EMAIL_HOST_USER'),
-            password=os.getenv('EMAIL_HOST_PASSWORD'),
-            use_tls=True
-        )
-        email_msg = EmailMessage(
-            subject='Your OTP Code',
-            body=f'Your OTP is: {otp_code}',
+        print(f"Generated OTP: {otp_code} for user: {self.user.email}")
+
+        send_mail(
+            subject='Password Reset OTP',
+            message=f'Your OTP for password reset is: {otp_code}',
             from_email=os.getenv('EMAIL_HOST_USER'),
-            to=[self.Admin_user.email],
-            connection=connection
+            recipient_list=[self.user.email],
+            fail_silently=False,
         )
-        email_msg.send()
 
-        return {"message": "OTP sent to email."}
-
+        return validated_data
+    
 class AdminForgotPasswordOTPValidateSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     otp = serializers.CharField(max_length=6, required=True)
@@ -84,6 +75,38 @@ class AdminForgotPasswordOTPValidateSerializer(serializers.Serializer):
     def validate(self, data):
         email = data.get('email')
         otp = data.get('otp')
+
+        user = User.objects.filter(email=email).first()
+        if not user:
+            raise serializers.ValidationError("User with this email does not exist.")
+
+        otp_obj = OTP.objects.filter(user=user, otp=otp).first()
+        if not otp_obj:
+            raise serializers.ValidationError("Invalid OTP.")
+
+        if otp_obj.is_expired():
+            raise serializers.ValidationError("OTP has expired.")
+
+        # Optional: Attach user or OTP object to serializer
+        self.user = user
+        self.otp_obj = otp_obj
+
+        return data
+
+
+class AdminForgotPasswordSetNewSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    otp = serializers.CharField(max_length=6,required=True)
+    new_password = serializers.CharField(write_only=True, required=True, min_length=8)
+    confirm_new_password=serializers.CharField(write_only=True,required=True, min_length=8)
+
+    def validate(self, data):
+        email = data.get('email')
+        otp= data.get('otp')
+        new_password = data.get('new_password')
+        confirm_new_password = data.get('confirm_new_password')
+        if new_password != confirm_new_password:
+            raise serializers.ValidationError("New password and confirm password do not match.")
         user = User.objects.filter(email=email).first()
         if not user:
             raise serializers.ValidationError("User with this email does not exist.")
@@ -92,29 +115,10 @@ class AdminForgotPasswordOTPValidateSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid OTP.")
         if otp_obj.is_expired():
             raise serializers.ValidationError("OTP has expired.")
-        data['message'] = "OTP verified."
-        return data
-
-class AdminForgotPasswordSetNewSerializer(serializers.Serializer):
-    eail = serializers.EmailField(required=True)
-    otp = serializers.CharField(max_length=6, required=True)
-    new_password = serializers.CharField(write_only=True, required=True, min_length=8)
-
-    def validate(self, data):
-        email = data.get('email')
-        otp = data.get('otp')
-        new_password = data.get('new_password')
-        user = User.objects.filter(email=email).first()
-        if not user:
-            raise serializers.ValidationError("User with this email does not exist.")
-        otp_obj = OTP.objects.filter(user=user, otp=otp).first()
-        if not otp_obj:
-            raise serializers.ValidationError("Invalid OTP.")
         user.set_password(new_password)
         user.save()
-        otp_obj.delete()
-        data['message'] = "Password reset successful."
         return data
+        
             
         
 
