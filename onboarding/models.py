@@ -16,7 +16,7 @@ class OTP(models.Model):
     
     def generate_otp(self):
         self.otp = str(random.randint(100000, 999999))  # Generates a 6-digit OTP
-        self.created_at = timezone.now()  # Refresh time if generating again
+        self.created_at = timezone.now()  
         self.save()
         return self.otp
 
