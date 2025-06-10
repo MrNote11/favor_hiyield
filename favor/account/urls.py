@@ -9,7 +9,7 @@ urlpatterns = [
 ]
 
 router = DefaultRouter()
-router.register(r'createsuperadmin', CreateUser, basename='createsuperuser')
+router.register(r'createadmins', CreateUser, basename='createsuperuser')
 router.register(r'assignusersrolesfeature', UserRoleAndFeatureViews, basename='assign'),
 router.register(r'customersandusers', AdminAndCustomerTotalViews, basename='customerandusers')
 router.register(r'bvnrecords', BvnRecordViews, basename='bvnrecords')
