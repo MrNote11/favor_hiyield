@@ -17,7 +17,7 @@ from .serializers import (SignUpSuperUserSerializers, LoginSerializer, UserRoleF
 from .models import Roles,  CustomUser, BvnRecords
 from django.contrib.auth.models import User
 from rest_framework.permissions import BasePermission
-
+from rest_framework.viewsets import ViewSet
 class IsSuperUserOnly(BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.is_superuser
@@ -33,15 +33,17 @@ class CreateUser(viewsets.ModelViewSet):
 
 class UserRoleAndFeatureViews(viewsets.ModelViewSet):
     serializer_class = UserRoleFeatureSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsSuperUserOnly]
     queryset = Roles.objects.select_related('admin_user')
     
     
 
-class AdminAndCustomerTotalViews(viewsets.ModelViewSet):
-    serializer_class = AdminAndCustomerSerializer
+class AdminAndCustomerTotalViews(ViewSet):
     permission_classes = [IsSuperUserOnly]
-    queryset = CustomUser.objects.all()
+
+    def list(self, request):
+        serializer = AdminAndCustomerSerializer(instance={})
+        return Response(serializer.data)
     
 
 

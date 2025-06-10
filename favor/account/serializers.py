@@ -66,13 +66,14 @@ class UserRoleFeatureSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
     user_username = serializers.SerializerMethodField()
     user_email = serializers.SerializerMethodField()
+    user_phone_number = serializers.SerializerMethodField()
     phone_number = serializers.CharField(write_only=True)
     
     
     class Meta:
         model = Roles
         fields = ['username', 'email', 'feature',
-                  'user_username', 'user_email', 'phone_number', 'roles']
+                  'user_username', 'user_email', 'phone_number', 'roles', 'user_phone_number']
         
     def get_user_username(self, obj):
         return obj.admin_user.username
@@ -80,7 +81,7 @@ class UserRoleFeatureSerializer(serializers.ModelSerializer):
     def get_user_email(self, obj):
         return obj.admin_user.email
     
-    def get_user_email(self, obj):
+    def get_user_phone_number(self, obj):
         return obj.admin_user.phone_number
     
     def validate_email(self, value):

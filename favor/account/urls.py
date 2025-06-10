@@ -11,6 +11,6 @@ urlpatterns = [
 router = DefaultRouter()
 router.register(r'createadmins', CreateUser, basename='createsuperuser')
 router.register(r'assignusersrolesfeature', UserRoleAndFeatureViews, basename='assign'),
-router.register(r'customersandusers', AdminAndCustomerTotalViews, basename='customerandusers')
+router.register(r'customerandusers', AdminAndCustomerTotalViews, basename='customerandusers')
 router.register(r'bvnrecords', BvnRecordViews, basename='bvnrecords')
 urlpatterns += router.urls
