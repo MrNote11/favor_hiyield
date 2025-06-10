@@ -20,8 +20,13 @@ class OTP(models.Model):
         return f"OTP for {self.user.email}: {self.otp}"
     
     def generate_otp(self):
+<<<<<<< HEAD
         self.otp = str(random.randint(100000, 999999))
         self.created_at = timezone.now()
+=======
+        self.otp = str(random.randint(100000, 999999))  # Generates a 6-digit OTP
+        self.created_at = timezone.now()  
+>>>>>>> 9ecc41afb69907099cb3581d65be9e9d18914bdc
         self.save()
         return self.otp
 
