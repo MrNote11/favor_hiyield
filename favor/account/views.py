@@ -7,13 +7,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, status, views, viewsets
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import SignUpSuperUserSerializers, LoginSerializer, UserRoleFeatureSerializer, AdminAndCustomerSerializer
-from .models import Roles,  CustomUser
+from .serializers import (SignUpSuperUserSerializers, LoginSerializer, UserRoleFeatureSerializer, 
+                          AdminAndCustomerSerializer, BvnRecordSerializers)
+from .models import Roles,  CustomUser, BvnRecords
 from django.contrib.auth.models import User
 from rest_framework.permissions import BasePermission
 
@@ -41,6 +42,13 @@ class AdminAndCustomerTotalViews(viewsets.ModelViewSet):
     serializer_class = AdminAndCustomerSerializer
     permission_classes = [IsSuperUserOnly]
     queryset = CustomUser.objects.all()
+    
+
+
+class BvnRecordViews(viewsets.ModelViewSet):
+    serializer_class = BvnRecordSerializers
+    permission_classes = [IsSuperUserOnly]
+    queryset = BvnRecords.objects.all()
     
 
     

@@ -149,7 +149,7 @@ class AdminAndCustomerSerializer(serializers.ModelSerializer):
         
 
 
-class BvnSerializers(serializers.ModelSerializer):
+class BvnRecordSerializers(serializers.ModelSerializer):
     
     verified_bvn = serializers.SerializerMethodField()
     unverified_bvn = serializers.SerializerMethodField()

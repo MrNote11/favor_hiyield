@@ -1,7 +1,7 @@
 from rest_framework.routers import DefaultRouter
 from django.contrib import admin
 from django.urls import path
-from .views import CreateUser, LoginView, UserRoleAndFeatureViews, AdminAndCustomerTotalViews
+from .views import CreateUser, LoginView, UserRoleAndFeatureViews, AdminAndCustomerTotalViews, BvnRecordViews
 
 
 urlpatterns = [
@@ -12,4 +12,5 @@ router = DefaultRouter()
 router.register(r'createsuperadmin', CreateUser, basename='createsuperuser')
 router.register(r'assignusersrolesfeature', UserRoleAndFeatureViews, basename='assign'),
 router.register(r'customersandusers', AdminAndCustomerTotalViews, basename='customerandusers')
+router.register(r'bvnrecords', BvnRecordViews, basename='bvnrecords')
 urlpatterns += router.urls
