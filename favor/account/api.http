@@ -1,0 +1,24 @@
+POST http://127.0.0.1:8000/register/assignusersrolesfeature/ HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "admin01",
+  "email": "alidsulaiman11@gmail.com",
+  "roles": "Dev",
+  "feature": "None"
+}
+
+
+
+###
+POST http://127.0.0.1:8000/register/login/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "amhhl@11",
+    "password": "mjSwND-QStly7A"
+}
+
+
+
+       
