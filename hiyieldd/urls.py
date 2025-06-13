@@ -25,7 +25,7 @@ load_dotenv()
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Hiyield  Admin Login and Forgot password API",
+        title="Hiyield Admin Login and Forgot Password API",
         default_version='v1',
         description="Full API documentation for your Hiyield.",
         terms_of_service="https://www.yourdomain.com/terms/",
@@ -34,13 +34,16 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(AllowAny,),
+    authentication_classes=[],
 )
+
+swagger_schema_view = schema_view.with_ui('swagger', cache_timeout=0)
 
 
 urlpatterns = [
     path('api/',include('onboarding.urls')),
     path('admin/', admin.site.urls),
-    path('swagger/v1/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('swagger/v1/', swagger_schema_view, name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'), 
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
