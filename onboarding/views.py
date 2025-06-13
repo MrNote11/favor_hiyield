@@ -36,7 +36,7 @@ class AdminForgotPasswordRequestView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({'message': 'OTP sent to email.'})
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 @swagger_auto_schema(
     request_body=AdminForgotPasswordOTPValidateSerializer,
     operation_description="Validate OTP for admin password reset",
@@ -56,7 +56,7 @@ class AdminSetNewPasswordView(APIView):
         serializer = AdminForgotPasswordSetNewSerializer(data=request.data)
         if serializer.is_valid():
             return Response({'message': 'Password reset successful.'})
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomerSignupView(CreateAPIView):
     serializer_class = CustomerSignupSerializer
@@ -76,12 +76,13 @@ class AllCustomersView(ListAPIView):
     def get(self, request, *args, **kwargs):
         if request.query_params.get('download') == 'true':
             queryset = self.filter_queryset(self.get_queryset())
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="customers.csv"'
+            
             writer = csv.writer(response)
             writer.writerow(['ID', 'Username', 'Email', 'Date Joined', 'Blacklisted'])
             for user in queryset:
                 writer.writerow([user.id, user.username, user.email, user.date_joined, user.blacklist])
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="customers.csv"'
             return response
         return super().get(request, *args, **kwargs)
 
@@ -108,3 +109,13 @@ class BlacklistToggleView(UpdateAPIView):
         user.save()
         status_text = "blacklisted" if user.blacklist else "unblacklisted"
         return Response({'message': f'Customer has been {status_text}.'})
+    
+class transactionHistoryView(ListAPIView):
+    
+    serializer_class = transaction_overviewSerializer
+    permission_classes = [permissions.IsAdminUser]
+    queryset = transaction.objects.all().order_by('-transaction_date')
+    
+      
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
