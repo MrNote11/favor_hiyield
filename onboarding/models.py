@@ -27,3 +27,29 @@ class OTP(models.Model):
 
     def is_expired(self):
         return timezone.now() > self.created_at + timedelta(minutes=10)
+    
+    class bank(models.Model):
+      name=models.CharField(max_length=100)
+      slug=models.SlugField(max_length=100, unique=True)
+
+    class card(models.Model):
+        name = models.CharField(max_length=100)
+        bank = models.ForeignKey('bank', on_delete=models.CASCADE)
+        card_number = models.CharField(max_length=16, unique=True)
+        expiry_date = models.DateField()
+        cvv = models.CharField(max_length=3)
+
+        def __str__(self):
+            return self.name
+    
+    class Transaction(models.Model):
+        user = models.ForeignKey(Customeruser, on_delete=models.CASCADE)
+        card = models.ForeignKey('card', on_delete=models.CASCADE)
+        bank = models.ForeignKey('bank', on_delete=models.CASCADE)
+        amount = models.DecimalField(max_digits=10, decimal_places=2)
+        transaction_date = models.DateTimeField(auto_now_add=True)
+        status = models.CharField(max_length=20, choices=[('success', 'Success'), ('failed', 'Failed')])
+
+        def __str__(self):
+            return f"Transaction {self.id} by {self.user.email} - {self.status}"
+        

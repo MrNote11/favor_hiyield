@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import OTP
+from .models import OTP,transaction,card,bank
 from django.core.mail import send_mail
 import os
 from dotenv import load_dotenv
@@ -94,3 +94,17 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'date_joined', 'phone_no', 'blacklist']
+
+class transaction_overviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = transaction
+        fields = ['id', 'user', 'card', 'bank', 'amount', 'transaction_date', 'status']
+
+class cardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = card
+        fields = ['id', 'name', 'bank', 'card_number', 'expiry_date', 'cvv']
+        extra_kwargs = {
+            'card_number': {'write_only': True},
+            'cvv': {'write_only': True}
+        }
